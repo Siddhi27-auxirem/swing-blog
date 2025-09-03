@@ -1,0 +1,130 @@
+import React from 'react';
+import { useParams, Link, Navigate } from 'react-router-dom';
+import { ArrowLeft, Clock, Calendar, ArrowRight } from 'lucide-react';
+import { blogs } from '../data/blogs';
+
+export default function BlogDetail() {
+  const { id } = useParams<{ id: string }>();
+  const blog = blogs.find(b => b.id === id);
+
+  if (!blog) {
+    return <Navigate to="/" replace />;
+  }
+
+  // Get suggested blogs (exclude current blog)
+  const suggestedBlogs = blogs
+    .filter(b => b.id !== blog.id)
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 3);
+
+  return (
+    <div className="min-h-screen bg-gray-50">
+      {/* Back Button */}
+      <div className="bg-white border-b border-gray-200">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+          <Link 
+            to="/" 
+            className="inline-flex items-center text-blue-600 hover:text-blue-800 font-medium transition-colors duration-200"
+          >
+            <ArrowLeft className="w-4 h-4 mr-2" />
+            Back to Blogs
+          </Link>
+        </div>
+      </div>
+
+      {/* Blog Content */}
+      <article className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        {/* Header */}
+        <header className="mb-8">
+          <div className="flex flex-wrap items-center gap-4 mb-6">
+            <span className="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-100 text-blue-800">
+              {blog.category}
+            </span>
+            <div className="flex items-center text-gray-500">
+              <Calendar className="w-4 h-4 mr-2" />
+              {new Date(blog.date).toLocaleDateString('en-US', { 
+                year: 'numeric', 
+                month: 'long', 
+                day: 'numeric' 
+              })}
+            </div>
+            <div className="flex items-center text-gray-500">
+              <Clock className="w-4 h-4 mr-2" />
+              {blog.readTime}
+            </div>
+          </div>
+          
+          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
+            {blog.title}
+          </h1>
+          
+          <p className="text-xl text-gray-600 leading-relaxed">
+            {blog.description}
+          </p>
+        </header>
+
+        {/* Featured Image */}
+        <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
+          <img
+            src={blog.image}
+            alt={blog.title}
+            className="w-full h-64 md:h-96 object-cover"
+          />
+        </div>
+
+        {/* Blog Content */}
+        <div 
+          className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-headings:font-bold"
+          dangerouslySetInnerHTML={{ __html: blog.content }}
+        />
+      </article>
+
+      {/* Suggested Blogs */}
+      <section className="bg-white py-12 border-t border-gray-200">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-8 text-center">
+            Suggested Articles
+          </h2>
+          
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            {suggestedBlogs.map((suggestedBlog) => (
+              <Link 
+                key={suggestedBlog.id} 
+                to={`/blog/${suggestedBlog.id}`}
+                className="group block"
+              >
+                <div className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
+                  <div className="aspect-video overflow-hidden">
+                    <img
+                      src={suggestedBlog.image}
+                      alt={suggestedBlog.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+                    />
+                  </div>
+                  <div className="p-4">
+                    <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded mb-2">
+                      {suggestedBlog.category}
+                    </span>
+                    <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
+                      {suggestedBlog.title}
+                    </h3>
+                    <p className="text-sm text-gray-600 line-clamp-2 mb-3">
+                      {suggestedBlog.description}
+                    </p>
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center text-xs text-gray-500">
+                        <Clock className="w-3 h-3 mr-1" />
+                        {suggestedBlog.readTime}
+                      </div>
+                      <ArrowRight className="w-4 h-4 text-blue-600 group-hover:translate-x-1 transition-transform duration-200" />
+                    </div>
+                  </div>
+                </div>
+              </Link>
+            ))}
+          </div>
+        </div>
+      </section>
+    </div>
+  );
+}
