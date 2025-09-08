@@ -14,7 +14,7 @@ function App() {
         <Navbar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
         <Routes>
           <Route path="/" element={<Home searchTerm={searchTerm} />} />
-          <Route path="/blog/:id" element={<BlogDetail />} />
+          <Route path="/post/:id" element={<BlogDetail/>} />
         </Routes>
         <Footer />
       </div>

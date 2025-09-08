@@ -29,7 +29,7 @@ export default function LatestBlogs({ blogs }: LatestBlogsProps) {
                 <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                   <div className="aspect-video overflow-hidden rounded-t-lg">
                     <img
-                      src={blog.image}
+                      src={blog.images}
                       alt={blog.title}
                       className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                     />

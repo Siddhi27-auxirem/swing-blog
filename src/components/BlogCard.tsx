@@ -14,9 +14,9 @@ export default function BlogCard({ blog }: BlogCardProps) {
         {/* Image Section */}
         <div className="md:w-1/3 aspect-video md:aspect-square overflow-hidden">
           <img
-            src={blog.image}
+            src={blog.images}
             alt={blog.title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
+            className="w-full h-full object-contain group-hover:scale-105 transition-transform duration-300"
           />
         </div>
         
@@ -39,9 +39,9 @@ export default function BlogCard({ blog }: BlogCardProps) {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">{blog.date}</span>
+            <span className="text-sm text-gray-500">{blog.updated_On}</span>
             <Link
-              to={`/blog/${blog.id}`}
+              to={`/post/${blog.id}`}
               className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors duration-200"
             >
               Read More
