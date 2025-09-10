@@ -1,52 +1,13 @@
-import React, { useEffect, useState } from "react";
+import React from "react";
 import BlogCard from "./BlogCard";
-import { Blog, getAllBlogs } from "../data/blogs"; // 👈 use the API function
+import { Blog } from "../data/blogs";
 import { Link } from "react-router-dom";
 
-export default function BlogGrid() {
-  const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+interface BlogGridProps {
+  blogs: Blog[];
+}
 
-  // ✅ Fetch blogs on mount
-  useEffect(() => {
-    console.log("Fetching blogs...");
-
-    getAllBlogs()
-      .then((data) => {
-        console.log("Fetched blogs:",data);
-        setBlogs(data);
-        setLoading(false);//stop loading after success
-      })
-      .catch((err) => {
-        setError(err.message);
-        setLoading(false);
-      })
-      .catch((err)=>{
-        console.error("Error fetching blogs:", err);
-        setError(err.message);
-        setLoading(false); // ✅ stop loading even if error
-      });
-}, []);
-
-  // ✅ Loading state
-  if (loading) {
-    return (
-      <div className="text-center py-12">
-        <p className="text-gray-500">Loading blogs...</p>
-      </div>
-    );
-  }
-
-  // ✅ Error state
-  if (error) {
-    return (
-      <div className="text-center py-12 text-red-600">
-        <p>Failed to load blogs: {error}</p>
-      </div>
-    );
-  }
-
+export default function BlogGrid({ blogs }: BlogGridProps) {
   // ✅ Empty state (if no blogs found)
   if (blogs.length === 0) {
     return (
@@ -83,15 +44,15 @@ export default function BlogGrid() {
     <section className="bg-gray-50 py-12">
       <div className="max-w-4xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="space-y-8">
-         {blogs.map(blog => (
-  <Link
-    key={blog.id}
-    to={`/post/${blog.id}`}  // The route for BlogDetail
-    state={{ blog }}         // ✅ Pass the blog data
-  >
-    <BlogCard blog={blog} />
-  </Link>
-))}
+          {blogs.map((blog) => (
+            <Link
+              key={blog.id}
+              to={`/post/${blog.id}`} // The route for BlogDetail
+              state={{ blog }}        // ✅ Pass the blog data
+            >
+              <BlogCard blog={blog} />
+            </Link>
+          ))}
         </div>
       </div>
     </section>

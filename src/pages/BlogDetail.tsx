@@ -75,7 +75,7 @@ useEffect(() => {
             {blog.title}
           </h1>
 
-          <p className="text-xl text-gray-600 leading-relaxed">{blog.description}</p>
+          <p dangerouslySetInnerHTML={{ __html: blog.description }} className="text-xl text-gray-600 leading-relaxed"></p>
         </header>
 
         {/* Featured Image */}

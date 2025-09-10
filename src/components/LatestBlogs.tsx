@@ -25,7 +25,7 @@ export default function LatestBlogs({ blogs }: LatestBlogsProps) {
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
           {latestBlogs.map((blog) => (
             <div key={blog.id} className="group">
-              <Link to={`/blog/${blog.id}`} className="block">
+              <Link to={`/post/${blog.id}`} className="block">
                 <div className="bg-white rounded-lg shadow-sm hover:shadow-md transition-all duration-300 hover:-translate-y-1">
                   <div className="aspect-video overflow-hidden rounded-t-lg">
                     <img
