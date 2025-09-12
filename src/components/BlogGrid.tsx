@@ -7,6 +7,11 @@ interface BlogGridProps {
   blogs: Blog[];
 }
 
+// ✅ Helper function to clean HTML (remove <img> and tags)
+function stripImagesFromHtml(html: string): string {
+  return html.replace(/<img[^>]*>/g, "").replace(/<[^>]+>/g, "");
+}
+
 export default function BlogGrid({ blogs }: BlogGridProps) {
   // ✅ Empty state (if no blogs found)
   if (blogs.length === 0) {
@@ -48,9 +53,14 @@ export default function BlogGrid({ blogs }: BlogGridProps) {
             <Link
               key={blog.id}
               to={`/post/${blog.id}`} // The route for BlogDetail
-              state={{ blog }}        // ✅ Pass the blog data
+              state={{ blog: { ...blog, content: stripImagesFromHtml(blog.content) } }} // ✅ cleaned content
             >
-              <BlogCard blog={blog} />
+              <BlogCard
+                blog={{
+                  ...blog,
+                  content: stripImagesFromHtml(blog.content), // ✅ pass cleaned content to BlogCard
+                }}
+              />
             </Link>
           ))}
         </div>

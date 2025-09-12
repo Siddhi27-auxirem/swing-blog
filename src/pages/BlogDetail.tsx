@@ -1,39 +1,61 @@
 import React, { useEffect, useState } from 'react';
-import { Link, Navigate, useParams } from 'react-router-dom';
+import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Clock, Calendar, ArrowRight } from 'lucide-react';
 import { Blog, getAllBlogs, getBlogById } from '../data/blogs';
 
+// ✅ Utility function to resize images
+function resizeImagesInContent(html: string): string {
+  return html.replace(/<img([^>]*)>/g, (match, attributes) => {
+    // remove existing width/height attributes
+    const cleaned = attributes
+      .replace(/width="[^"]*"/g, '')
+      .replace(/height="[^"]*"/g, '');
 
+    // inject style for fixed size
+    return `<img ${cleaned} style="max-width:400px; height:auto; display:block; margin:auto;" />`;
+  });
+}
 
 export default function BlogDetail() {
-
   const { id } = useParams();
   const [blog, setBlog] = useState<Blog | null>(null);
   const [loading, setLoading] = useState(true);
   const [suggestedBlogs, setSuggestedBlogs] = useState<Blog[]>([]);
+  const navigate = useNavigate();
+
+
+  function stripImagesFromHtml(html: string): string {
+  return html.replace(/<img[^>]*>/g, "").replace(/<[^>]+>/g, "");
+};
+
 
   // Fetch blog by ID
-useEffect(() => {
-  if (!id) return; // ✅ exit if id is missing
+  useEffect(() => {
+    if (!id) return;
 
-  getBlogById(id)
-    .then((data) => setBlog(data))
-    .catch((err) => console.error('Error fetching blog:', err))
-    .finally(() => setLoading(false));
+    getBlogById(id)
+      .then((data) => setBlog(data))
+      .catch((err) => console.error('Error fetching blog:', err))
+      .finally(() => setLoading(false));
 
-  getAllBlogs()
-    .then((data) => setSuggestedBlogs(data.filter((b) => b.id !== id).slice(0, 3)))
-    .catch((err) => console.error('Error fetching suggested blogs:', err));
-}, [id]);
+    getAllBlogs()
+      .then((data) =>
+        setSuggestedBlogs(data.filter((b) => b.id !== id).slice(0, 3))
+      )
+      .catch((err) => console.error('Error fetching suggested blogs:', err));
+  }, [id]);
 
- useEffect(() => {
+  useEffect(() => {
     window.scrollTo(0, 0);
   }, [id]);
 
-
   if (loading) {
-    return <p className="text-center py-12">Loading blog...</p>;
-  }
+  return (
+    <div className="flex justify-center h-screen items-center py-12">
+      <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
 
   if (!blog) {
     return <Navigate to="/" replace />;
@@ -63,30 +85,38 @@ useEffect(() => {
             </span>
             <div className="flex items-center text-gray-500">
               <Calendar className="w-4 h-4 mr-2" />
-              {new Date(blog.updated_On).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}
+              {new Date(blog.updated_On).toLocaleDateString('en-US', {
+                year: 'numeric',
+                month: 'long',
+                day: 'numeric',
+              })}
             </div>
-            <div className="flex items-center text-gray-500">
-              <Clock className="w-4 h-4 mr-2" />
-              {blog.readTime} min
-            </div>
+           
           </div>
 
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 mb-4 leading-tight">
             {blog.title}
           </h1>
 
-          <p dangerouslySetInnerHTML={{ __html: blog.description }} className="text-xl text-gray-600 leading-relaxed"></p>
+          {/* Short content preview */}
+      
         </header>
 
         {/* Featured Image */}
         <div className="mb-8 rounded-xl overflow-hidden shadow-lg">
-          <img src={blog.images} alt={blog.title} className="w-full h-64 md:h-96 object-cover" />
+          <img
+            src={blog.thumbnailImage}
+            alt={blog.title}
+            className="w-full h-64 md:h-96 object-cover"
+          />
         </div>
 
-        {/* Blog Content */}
+        {/* Full Blog Content */}
         <div
           className="prose prose-lg max-w-none prose-headings:text-gray-900 prose-p:text-gray-700 prose-p:leading-relaxed prose-headings:font-bold"
-          dangerouslySetInnerHTML={{ __html: blog.content }}
+          dangerouslySetInnerHTML={{
+            __html: resizeImagesInContent(blog.content),
+          }}
         />
       </article>
 
@@ -109,7 +139,7 @@ useEffect(() => {
                   <div className="bg-gray-50 rounded-lg overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                     <div className="aspect-video overflow-hidden">
                       <img
-                        src={suggestedBlog.images}
+                        src={suggestedBlog.thumbnailImage}
                         alt={suggestedBlog.title}
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300"
                       />
@@ -118,10 +148,15 @@ useEffect(() => {
                       <span className="inline-block px-2 py-1 text-xs font-medium bg-blue-100 text-blue-800 rounded mb-2">
                         {suggestedBlog.category}
                       </span>
-                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200">
+                      <h3 className="font-semibold text-gray-900 mb-2 line-clamp-2 group-hover:text-blue-600 transition-colors duration-200" onClick={()=> navigate(`/post/${blog.id}`)}>
                         {suggestedBlog.title}
                       </h3>
-                      <p className="text-sm text-gray-600 line-clamp-2 mb-3">{suggestedBlog.description}</p>
+                     <p
+                    dangerouslySetInnerHTML={{ __html: stripImagesFromHtml(blog.content) }}
+                    className="text-sm text-gray-600 line-clamp-2 mb-3"
+                     />
+
+                  
                       <div className="flex items-center justify-between">
                         <div className="flex items-center text-xs text-gray-500">
                           <Clock className="w-3 h-3 mr-1" />

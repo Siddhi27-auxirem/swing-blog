@@ -1,76 +1,99 @@
-import { useEffect, useState, useMemo } from 'react';
-import { Blog, getAllBlogs } from '../data/blogs';
-import Hero from '../components/Hero';
-import CategoryFilter from '../components/CategoryFilter';
-import BlogGrid from '../components/BlogGrid';
-import LatestBlogs from '../components/LatestBlogs';
+import { useEffect, useState, useMemo } from "react";
+import { Blog, getAllBlogs } from "../data/blogs";
+import Hero from "../components/Hero";
+import CategoryFilter from "../components/CategoryFilter";
+import BlogGrid from "../components/BlogGrid";
 
 interface HomeProps {
-  searchTerm: string;
+  searchTerm: string; // ✅ coming from App
 }
 
 export default function Home({ searchTerm }: HomeProps) {
+  console.log("Home received searchTerm:",searchTerm);
+  
   const [blogs, setBlogs] = useState<Blog[]>([]);
-  const [activeCategory, setActiveCategory] = useState<string>('All');
+  const [activeCategory, setActiveCategory] = useState<string>("All");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch blogs from backend
   useEffect(() => {
     setLoading(true);
     getAllBlogs()
-      .then((data) => setBlogs(data))
-      .catch(() => setError('Failed to load blogs'))
+      .then((data) => {
+        console.log("Fetched blogs:", data); // 🔍 Debug
+        setBlogs(data);
+      })
+      .catch(() => setError("Failed to load blogs"))
       .finally(() => setLoading(false));
   }, []);
 
-  // ✅ Unique + sorted categories
   const categories = useMemo(() => {
     const uniqueCategories = Array.from(
-      new Set(blogs.map(blog => blog.category.trim()))
+      new Set(blogs.map((blog) => blog.category.trim()))
     );
-    return ['All', ...uniqueCategories.sort((a, b) => a.localeCompare(b))];
+    return ["All", ...uniqueCategories.sort((a, b) => a.localeCompare(b))];
   }, [blogs]);
 
-  // ✅ Filter blogs by category + search term
   const filteredBlogs = useMemo(() => {
     let filtered = blogs;
 
-    if (activeCategory !== 'All') {
+    if (activeCategory !== "All") {
       filtered = filtered.filter(
-        blog =>
+        (blog) =>
           blog.category.trim().toLowerCase() ===
           activeCategory.trim().toLowerCase()
       );
     }
 
+    console.log(searchTerm)
+
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();
-      filtered = filtered.filter(
-        blog =>
+      const term = searchTerm.toLowerCase();  
+      console.log(term)
+      filtered = filtered.filter((blog) => {
+        // const plainContent = blog.content.replace(/<[^>]+>/g, "");
+        return (
           blog.title.toLowerCase().includes(term) ||
-          blog.description.toLowerCase().includes(term) ||
-          blog.category.toLowerCase().includes(term) ||
-          blog.content.toLowerCase().includes(term)
-      );
+          // plainContent.toLowerCase().includes(term) ||
+          blog.category.toLowerCase().includes(term)
+        );
+      });
     }
 
+    console.log("Filtered blogs:", filtered); // 🔍 Debug
     return filtered;
   }, [blogs, activeCategory, searchTerm]);
 
-  if (loading) return <p className="text-center py-12">Loading blogs...</p>;
-  if (error) return <p className="text-center py-12 text-red-600">{error}</p>;
+  if (loading) {
+  return (
+    <div className="flex justify-center h-screen items-center py-12">
+      <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+    </div>
+  );
+}
+
+
+  if (error) {
+    return <p className="text-center py-12 text-red-600">{error}</p>;
+  }
 
   return (
     <div>
       <Hero />
-      <CategoryFilter
-        categories={categories}
-        activeCategory={activeCategory}
-        onCategoryChange={setActiveCategory}
-      />
-      <BlogGrid blogs={filteredBlogs} />
-      {!searchTerm && activeCategory === 'All' && <LatestBlogs blogs={blogs} />}
+
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <CategoryFilter
+          categories={categories}
+          activeCategory={activeCategory}
+          onCategoryChange={setActiveCategory}
+        />
+
+        <BlogGrid blogs={filteredBlogs} />
+      </div>
     </div>
   );
 }
+
+
+
+      

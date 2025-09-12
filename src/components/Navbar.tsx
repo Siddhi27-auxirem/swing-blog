@@ -43,7 +43,7 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
                 onChange={(e) => onSearchChange(e.target.value)}
                 className="block w-64 pl-10 pr-3 py-2 border border-gray-300 rounded-lg leading-5 bg-white placeholder-gray-500 focus:outline-none focus:placeholder-gray-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500"
               />
-            </div>
+            </div>  
 
             {/* CTA Button */}
             <a
@@ -93,7 +93,7 @@ export default function Navbar({ searchTerm, onSearchChange }: NavbarProps) {
               </div>
 
               <a
-                href="https://your-project-url.com"
+                href="https://swingpicker.com"
                 className="block mt-3 bg-blue-600 text-white px-6 py-2 rounded-lg font-medium hover:bg-blue-700 transition-colors duration-200 text-center"
               >
                 Start Your Journey

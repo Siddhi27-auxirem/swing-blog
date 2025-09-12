@@ -4,8 +4,7 @@ import React, { useEffect, useState } from "react";
 export interface Blog{
   id: string;
   title: string;
-  description: string;
-  images: string;
+  thumbnailImage: string;
   author:string;
   category: string;
   tags: string[];
@@ -22,11 +21,11 @@ export interface Blog{
 
 export const blogs: Blog[] = [];
 
-const BASE_URL = "http://localhost:8080/blogs";
+const BASE_URL = "https://node249428-env-8797427.in1.apiqcloud.com/blogs"; 
 
 // Get All Blogs (GET -> /blogs/all)
 export const getAllBlogs = async (): Promise<Blog[]> => {
-  const res = await fetch(`http://localhost:8080/blogs/all`);
+  const res = await fetch(`${BASE_URL}/all`);
   if (!res.ok) throw new Error("Failed to fetch blogs");
   return res.json();
 };
