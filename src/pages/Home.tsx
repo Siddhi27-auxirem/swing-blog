@@ -9,8 +9,8 @@ interface HomeProps {
 }
 
 export default function Home({ searchTerm }: HomeProps) {
-  console.log("Home received searchTerm:",searchTerm);
-  
+  console.log("Home received searchTerm:", searchTerm);
+
   const [blogs, setBlogs] = useState<Blog[]>([]);
   const [activeCategory, setActiveCategory] = useState<string>("All");
   const [loading, setLoading] = useState(true);
@@ -48,7 +48,7 @@ export default function Home({ searchTerm }: HomeProps) {
     console.log(searchTerm)
 
     if (searchTerm) {
-      const term = searchTerm.toLowerCase();  
+      const term = searchTerm.toLowerCase();
       console.log(term)
       filtered = filtered.filter((blog) => {
         // const plainContent = blog.content.replace(/<[^>]+>/g, "");
@@ -64,13 +64,17 @@ export default function Home({ searchTerm }: HomeProps) {
     return filtered;
   }, [blogs, activeCategory, searchTerm]);
 
+  useEffect(() => {
+    document.title = "SwingPicker Blog";
+  }, []);
+
   if (loading) {
-  return (
-    <div className="flex justify-center h-screen items-center py-12">
-      <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
-    </div>
-  );
-}
+    return (
+      <div className="flex justify-center h-screen items-center py-12">
+        <div className="w-10 h-10 border-4 border-blue-500 border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
 
   if (error) {
@@ -96,4 +100,3 @@ export default function Home({ searchTerm }: HomeProps) {
 
 
 
-      

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 
 export interface Blog{
+  created_On: string;
   id: string;
   title: string;
   thumbnailImage: string;
@@ -22,6 +23,8 @@ export interface Blog{
 export const blogs: Blog[] = [];
 
 const BASE_URL = "https://node249428-env-8797427.in1.apiqcloud.com/blogs"; 
+
+
 
 // Get All Blogs (GET -> /blogs/all)
 export const getAllBlogs = async (): Promise<Blog[]> => {

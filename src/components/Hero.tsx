@@ -1,6 +1,8 @@
-import React from 'react';
+import React, { useEffect } from 'react';
 
 export default function Hero() {
+
+
   return (
     <section className="bg-gradient-to-r from-gray-100 via-blue-50 to-gray-100 text-gray-800 py-16 md:py-24">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
