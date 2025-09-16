@@ -16,6 +16,23 @@
     -webkit-box-orient: vertical;
     -webkit-line-clamp: 3;
   }
+
+  /* Modal fade-in and slide-up animation */
+@keyframes fadeSlideUp {
+  0% {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-animate {
+  animation: fadeSlideUp 0.3s ease-out;
+}
+
 }
 
 /* Prose styles for blog content */

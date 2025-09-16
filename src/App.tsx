@@ -1,42 +1,36 @@
-import React, { useState } from 'react';
-import { BrowserRouter as Router, Routes, Route, BrowserRouter } from 'react-router-dom';
-import Navbar from './components/Navbar';
-import Footer from './components/Footer';
-import Home from './pages/Home';
-import BlogDetail from './pages/BlogDetail';
-
-if(process.env.NODE_ENV==="production"){
-  console.log = () =>{}
-  console.warn = () =>{}
-  console.error = () =>{}
-  console.trace = () =>{}
-}
-
+import { useState, useEffect } from "react";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import Navbar from "./components/Navbar";
+import Home from "./pages/Home";
+import BlogDetail from "./pages/BlogDetail";
+import { Blog, getAllBlogs } from "./data/blogs";
 
 function App() {
-  const [searchTerm, setSearchTerm] = useState('');
+  const [searchTerm, setSearchTerm] = useState("");
+  const [blogs, setBlogs] = useState<Blog[]>([]);
+
   console.log("App searchTerm:", searchTerm);
 
+  // fetch blogs once
+  useEffect(() => {
+    getAllBlogs()
+      .then((data) => setBlogs(data))
+      .catch((err) => console.error("Error fetching blogs:", err));
+  }, []);
+
   return (
-     <Router  basename='/blogs'> 
-      
-     
-      <div className="min-h-screen bg-gray-50">
-        {/* Navbar always visible */}
-        <Navbar searchTerm={searchTerm} onSearchChange={setSearchTerm} />
+    <Router basename='/blogs'>
+      {/* ✅ pass blogs, searchTerm, onSearchChange to Navbar */}
+      <Navbar
+        searchTerm={searchTerm}
+        onSearchChange={setSearchTerm}
+        blogs={blogs}
+      />
 
-
-  <Routes>
-          {/* Pass searchTerm into Home */}
-          <Route path="/" element={<Home searchTerm={searchTerm} />} />
-          <Route path="/post/:id" element={<BlogDetail/>} />
-        </Routes>
-
-
-      
-
-        <Footer />
-      </div>
+      <Routes>
+        <Route path="/" element={<Home searchTerm={searchTerm} />} />
+        <Route path="/post/:id" element={<BlogDetail />} />
+      </Routes>
     </Router>
   );
 }

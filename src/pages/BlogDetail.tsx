@@ -88,7 +88,7 @@ export default function BlogDetail() {
   }
 
   if (!blog) {
-    return <Navigate to="/" replace />;
+    return <Navigate to="/blogs" replace />;
   }
 
   return (

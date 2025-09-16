@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 
 
 export interface Blog{
+  images: string[];
   created_On: string;
   id: string;
   title: string;
