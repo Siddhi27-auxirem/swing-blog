@@ -18,7 +18,9 @@ function App() {
   console.log("App searchTerm:", searchTerm);
 
   return (
-     <Router basename='/blogs'>  
+     <Router  basename='/blogs'> 
+      
+     
       <div className="min-h-screen bg-gray-50">
         {/* Navbar always visible */}
         <Navbar searchTerm={searchTerm} onSearchChange={setSearchTerm} />

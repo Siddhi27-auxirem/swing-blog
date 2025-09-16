@@ -2,6 +2,8 @@ import React from 'react';
 import { Link } from 'react-router-dom';
 import { Clock, ArrowRight } from 'lucide-react';
 import { Blog } from '../data/blogs';
+import BlogDetail, { formatDateIST } from '../pages/BlogDetail';
+
 
 interface BlogCardProps {
   blog: Blog;
@@ -36,7 +38,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
           </div>
           
           <div className="flex justify-between items-center">
-            <span className="text-sm text-gray-500">{blog.updated_On}</span>
+            <span className="text-sm text-gray-500">{formatDateIST(blog.updated_On)}</span>
             <Link
               to={`/post/${blog.id}`}
               className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors duration-200"
