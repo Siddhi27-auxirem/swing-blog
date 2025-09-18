@@ -14,7 +14,7 @@ export default function BlogCard({ blog }: BlogCardProps) {
     <div className="bg-white rounded-xl shadow-md overflow-hidden hover:shadow-xl transition-all duration-300 hover:-translate-y-1 group">
       <div className="flex flex-col md:flex-row">
         {/* Image Section */}
-        <div className="md:w-1/3 aspect-video md:aspect-square overflow-hidden">
+        <div className="md:w-1/3 aspect-video md:aspect-square rounded-lg overflow-hidden">
           <img
             src={blog.thumbnailImage}
             alt={blog.title}
@@ -37,11 +37,11 @@ export default function BlogCard({ blog }: BlogCardProps) {
             <p  dangerouslySetInnerHTML={{ __html: blog.content }} className="text-gray-600 mb-4 line-clamp-3"></p>
           </div>
           
-          <div className="flex justify-between items-center">
+          <div className="flex justify-between gap-2 items-center">
             <span className="text-sm text-gray-500">{formatDateIST(blog.updated_On)}</span>
             <Link
               to={`/post/${blog.id}`}
-              className="inline-flex items-center text-blue-600 font-medium hover:text-blue-800 transition-colors duration-200"
+              className="inline-flex items-center text-sm text-blue-600 font-medium hover:text-blue-800 whitespace-nowrap transition-colors duration-200"
             >
               Read More
               <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform duration-200" />
@@ -52,3 +52,4 @@ export default function BlogCard({ blog }: BlogCardProps) {
     </div>
   );
 }
+

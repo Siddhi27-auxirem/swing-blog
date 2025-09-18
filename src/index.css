@@ -33,6 +33,27 @@
   animation: fadeSlideUp 0.3s ease-out;
 }
 
+/* ================================
+   Navbar Responsive Styles
+   ================================ */
+
+/* Mobile menu animation */
+@keyframes slideDown {
+  0% {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-mobile {
+  animation: slideDown 0.3s ease-out;
+}
+
+
 }
 
 /* Prose styles for blog content */
