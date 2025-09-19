@@ -1,10 +1,35 @@
 import React, { useEffect, useState } from 'react';
 import { Link, Navigate, useNavigate, useParams } from 'react-router-dom';
 import { ArrowLeft, Calendar, ArrowRight } from 'lucide-react';
-import { Blog, getAllBlogs, getBlogById } from '../data/blogs';
+import { Blog, getAllBlogs, getBlogById as originalGetBlogById } from '../data/blogs';
 
+// --- Utility to cache blogs locally ---
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
 
-// Utility to resize images in blog content
+const getCachedBlogs = (): Blog[] | null => {
+  const stored = localStorage.getItem('blogs');
+  const storedTime = localStorage.getItem('blogs_time');
+  if (stored && storedTime && Date.now() - parseInt(storedTime) < CACHE_DURATION) {
+    return JSON.parse(stored);
+  }
+  return null;
+};
+
+const setCachedBlogs = (blogs: Blog[]) => {
+  localStorage.setItem('blogs', JSON.stringify(blogs));
+  localStorage.setItem('blogs_time', Date.now().toString());
+};
+
+const getBlogById = async (id: string): Promise<Blog> => {
+  const cached = localStorage.getItem(`blog_${id}`);
+  if (cached) return JSON.parse(cached);
+
+  const data = await originalGetBlogById(id);
+  localStorage.setItem(`blog_${id}`, JSON.stringify(data));
+  return data;
+};
+
+// --- Utility to resize images in blog content ---
 function resizeImagesInContent(html: string): string {
   return html.replace(/<img([^>]*)>/g, (match, attributes) => {
     const cleaned = attributes
@@ -32,7 +57,7 @@ export function formatDateIST(dateString: string) {
   }
 }
 
-// Strip images and HTML tags (used in suggested blogs)
+// Strip images and HTML tags
 function stripHtml(html: string): string {
   return html.replace(/<img[^>]*>/g, '').replace(/<[^>]+>/g, '');
 }
@@ -48,17 +73,38 @@ export default function BlogDetail() {
   // Fetch blog & suggested blogs
   useEffect(() => {
     if (!id) return;
-
     setLoading(true);
 
+    // Fetch main blog (with caching)
     getBlogById(id)
       .then((data) => setBlog(data))
       .catch((err) => console.error('Error fetching blog:', err))
       .finally(() => setLoading(false));
 
-    getAllBlogs()
-      .then((data) => setSuggestedBlogs(data.filter((b) => b.id !== id).slice(0, 3)))
-      .catch((err) => console.error('Error fetching suggested blogs:', err));
+    // Fetch all blogs (with caching) for suggested articles
+    const cachedAll = getCachedBlogs();
+    if (cachedAll) {
+      setSuggestedBlogs(cachedAll.filter((b) => b.id !== id).slice(0, 3));
+    } else {
+      getAllBlogs()
+        .then((data) => {
+          setCachedBlogs(data);
+          setSuggestedBlogs(data.filter((b) => b.id !== id).slice(0, 3));
+        })
+        .catch((err) => console.error('Error fetching suggested blogs:', err));
+    }
+
+    // Background refresh for this tab
+    const interval = setInterval(() => {
+      getAllBlogs()
+        .then((data) => {
+          setCachedBlogs(data);
+          setSuggestedBlogs(data.filter((b) => b.id !== id).slice(0, 3));
+        })
+        .catch(() => {});
+    }, CACHE_DURATION);
+
+    return () => clearInterval(interval);
   }, [id]);
 
   // Update document title
@@ -82,9 +128,7 @@ export default function BlogDetail() {
     );
   }
 
-  if (!blog) {
-    return <Navigate to="/" replace />;
-  }
+  if (!blog) return <Navigate to="/" replace />;
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-50 overflow-x-hidden">

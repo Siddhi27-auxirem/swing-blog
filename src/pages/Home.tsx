@@ -1,13 +1,37 @@
 import { useEffect, useState, useMemo } from "react";
-import { Blog, getAllBlogs } from "../data/blogs";
+import { Blog, getAllBlogs as originalGetAllBlogs } from "../data/blogs";
 import Hero from "../components/Hero";
 import CategoryFilter from "../components/CategoryFilter";
 import BlogGrid from "../components/BlogGrid";
 
-
 interface HomeProps {
   searchTerm: string;
 }
+
+const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+const getCachedBlogs = (): Blog[] | null => {
+  const stored = localStorage.getItem("blogs");
+  const storedTime = localStorage.getItem("blogs_time");
+  if (stored && storedTime && Date.now() - parseInt(storedTime) < CACHE_DURATION) {
+    return JSON.parse(stored);
+  }
+  return null;
+};
+
+const setCachedBlogs = (blogs: Blog[]) => {
+  localStorage.setItem("blogs", JSON.stringify(blogs));
+  localStorage.setItem("blogs_time", Date.now().toString());
+};
+
+const getAllBlogs = async (): Promise<Blog[]> => {
+  const cached = getCachedBlogs();
+  if (cached) return cached;
+
+  const data = await originalGetAllBlogs();
+  setCachedBlogs(data);
+  return data;
+};
 
 export default function Home({ searchTerm }: HomeProps) {
   const [blogs, setBlogs] = useState<Blog[]>([]);
@@ -15,12 +39,11 @@ export default function Home({ searchTerm }: HomeProps) {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch blogs once
+  // Fetch blogs once (uses cache)
   useEffect(() => {
     setLoading(true);
     getAllBlogs()
       .then((data) => {
-        // Trim categories immediately
         const cleanedData = data.map((b) => ({
           ...b,
           category: b.category ? b.category.trim() : "Uncategorized",
@@ -79,6 +102,5 @@ export default function Home({ searchTerm }: HomeProps) {
     </div>
   );
 }
-
 
 

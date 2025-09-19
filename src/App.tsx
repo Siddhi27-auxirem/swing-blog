@@ -11,12 +11,19 @@ import { Blog, getAllBlogs } from "./data/blogs";
 function AnimatedRoutes({searchTerm}: {searchTerm: string}) {
   const location = useLocation();
 
-  return(
+  return (
     <AnimatePresence mode="wait">
       <Routes location={location} key={location.pathname}>
-        <Route path="/" element={<PageWrapper><Home searchTerm={searchTerm}/>
-      </PageWrapper>} />
-      <Route path="/post/:id" element={<PageWrapper><BlogDetail/></PageWrapper>}/>
+        <Route path="/" element={
+          <PageWrapper>
+            <Home searchTerm={searchTerm}/>
+          </PageWrapper>
+        } />
+        <Route path="/post/:id" element={
+          <PageWrapper>
+            <BlogDetail/>
+          </PageWrapper>
+        }/>
       </Routes>
     </AnimatePresence>
   )
@@ -26,17 +33,56 @@ function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [blogs, setBlogs] = useState<Blog[]>([]);
 
-  // Fetch blogs once
+  const CACHE_DURATION = 60 * 60 * 1000; // 1 hour
+
+  const fetchAndCacheBlogs = async () => {
+    try {
+      const data = await getAllBlogs();
+      setBlogs(data);
+      localStorage.setItem("blogs", JSON.stringify(data));
+      localStorage.setItem("blogs_time", Date.now().toString());
+    } catch (err) {
+      console.error("Error fetching blogs:", err);
+    }
+  };
+
   useEffect(() => {
-    getAllBlogs()
-      .then((data) => setBlogs(data))
-      .catch((err) => console.error("Error fetching blogs:", err));
+    const storedBlogs = localStorage.getItem("blogs");
+    const storedTime = localStorage.getItem("blogs_time");
+    const now = Date.now();
+
+    if (storedBlogs && storedTime && now - parseInt(storedTime) < CACHE_DURATION) {
+      setBlogs(JSON.parse(storedBlogs));
+    } else {
+      fetchAndCacheBlogs();
+    }
+
+    const handleVisibilityChange = () => {
+      if (document.visibilityState === "visible") {
+        const lastFetched = parseInt(localStorage.getItem("blogs_time") || "0");
+        if (Date.now() - lastFetched >= CACHE_DURATION) {
+          fetchAndCacheBlogs();
+        }
+      }
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    // Optional: Background refresh interval for active tabs only
+    const interval = setInterval(() => {
+      if (document.visibilityState === "visible") {
+        fetchAndCacheBlogs();
+      }
+    }, CACHE_DURATION);
+
+    return () => {
+      clearInterval(interval);
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
   }, []);
 
   return (
-    <Router basename='/blogs' >  
-      
-      
+    <Router basename='/blogs'>  
       <div className="flex flex-col min-h-screen pt-16 overflow-x-hidden">
         {/* Navbar */}
         <Navbar
@@ -47,6 +93,7 @@ function App() {
 
         {/* Animated page content */}
         <AnimatedRoutes searchTerm={searchTerm}/>
+
         {/* Footer */}
         <Footer />
       </div>
