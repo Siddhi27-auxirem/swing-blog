@@ -1,10 +1,26 @@
 import { useState, useEffect } from "react";
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
+import { AnimatePresence } from "framer-motion";
+import PageWrapper from "./components/PageWrapper";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 import Home from "./pages/Home";
 import BlogDetail from "./pages/BlogDetail";
 import { Blog, getAllBlogs } from "./data/blogs";
+
+function AnimatedRoutes({searchTerm}: {searchTerm: string}) {
+  const location = useLocation();
+
+  return(
+    <AnimatePresence mode="wait">
+      <Routes location={location} key={location.pathname}>
+        <Route path="/" element={<PageWrapper><Home searchTerm={searchTerm}/>
+      </PageWrapper>} />
+      <Route path="/post/:id" element={<PageWrapper><BlogDetail/></PageWrapper>}/>
+      </Routes>
+    </AnimatePresence>
+  )
+}
 
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
@@ -18,8 +34,10 @@ function App() {
   }, []);
 
   return (
-    <Router basename='/blogs'>    
-      <div className="flex flex-col min-h-screen overflow-x-hidden">
+    <Router basename='/blogs' >  
+      
+      
+      <div className="flex flex-col min-h-screen pt-16 overflow-x-hidden">
         {/* Navbar */}
         <Navbar
           searchTerm={searchTerm}
@@ -27,14 +45,8 @@ function App() {
           blogs={blogs}
         />
 
-        {/* Page Content */}
-        <div className="flex-1">
-          <Routes>
-            <Route path="/" element={<Home searchTerm={searchTerm} />} />
-            <Route path="/post/:id" element={<BlogDetail />} />
-          </Routes>
-        </div>
-
+        {/* Animated page content */}
+        <AnimatedRoutes searchTerm={searchTerm}/>
         {/* Footer */}
         <Footer />
       </div>

@@ -28,7 +28,7 @@ export default function Navbar({ searchTerm, onSearchChange, blogs }: NavbarProp
   return (
     <>
       {/* Navbar */}
-      <nav className="bg-white shadow-lg sticky top-0 z-50 w-full">
+      <nav className="bg-white shadow-lg fixed top-0 left-0 z-50 w-full">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-16">
             {/* Logo */}
@@ -43,8 +43,8 @@ export default function Navbar({ searchTerm, onSearchChange, blogs }: NavbarProp
 
             {/* Desktop Menu */}
             <div className="hidden xl:flex items-center gap-6">
-              {["Home","Community","Features","Algorithms","Pricing","Blog"].map((text, idx) => {
-                const links = ["https://swingpicker.com","https://thetradesocial.com","https://swingpicker.com/features","https://swingpicker.com/algos","https://swingpicker.com/pricing","/"];
+              {["Home", "Community", "Features", "Algorithms", "Pricing", "Blog"].map((text, idx) => {
+                const links = ["https://swingpicker.com", "https://thetradesocial.com", "https://swingpicker.com/features", "https://swingpicker.com/algos", "https://swingpicker.com/pricing", "/"];
                 return (
                   <Link
                     key={idx}
@@ -95,8 +95,8 @@ export default function Navbar({ searchTerm, onSearchChange, blogs }: NavbarProp
           {isMenuOpen && (
             <div className="xl:hidden border-t border-gray-200 w-full nav-mobile">
               <div className="flex flex-col px-2 pt-2 pb-3 space-y-2">
-                {["Home","Community","Features","Algorithms","Pricing","Blog"].map((text, idx) => {
-                  const links = ["https://swingpicker.com","https://thetradesocial.com","https://swingpicker.com/features","https://swingpicker.com/algos","https://swingpicker.com/pricing","/"];
+                {["Home", "Community", "Features", "Algorithms", "Pricing", "Blog"].map((text, idx) => {
+                  const links = ["https://swingpicker.com", "https://thetradesocial.com", "https://swingpicker.com/features", "https://swingpicker.com/algos", "https://swingpicker.com/pricing", "/"];
                   return (
                     <Link
                       key={idx}
@@ -159,7 +159,9 @@ export default function Navbar({ searchTerm, onSearchChange, blogs }: NavbarProp
                     key={blog.id}
                     to={`/post/${blog.id}`}
                     className="border rounded-lg shadow-sm hover:shadow-lg transition overflow-hidden bg-white"
-                    onClick={() => setIsModalOpen(false)}
+                    onClick={() => {setIsModalOpen(false);//close the search modal
+                                     onSearchChange("");//clear the search input
+                    }}
                   >
                     {blog.images?.length > 0 && (
                       <img
@@ -168,11 +170,15 @@ export default function Navbar({ searchTerm, onSearchChange, blogs }: NavbarProp
                         className="w-full h-40 object-cover"
                       />
                     )}
-                    <div className="p-4">
-                      <h3 className="font-semibold text-lg mb-1 truncate">
+                    <div className="p-4 rounded-lg bg-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all duration-300 group">
+                      <img src={blog.thumbnailImage}
+                        alt={blog.title}
+                        className="w-full h-40 object-cover rounded-md 
+                                  group-hover:scale-105 transition-transform duration-300"/>
+                      <h3 className="group-hover:text-blue-600 transition-colors duration-300 font-semibold text-lg mb-1 truncate">
                         {blog.title}
                       </h3>
-                      <p className="text-sm text-gray-600 mb-1 truncate">
+                      <p className="text-sm text-gray-600 mb-1 truncate ">
                         {blog.category}
                       </p>
                       <p className="text-gray-500 text-sm line-clamp-3">

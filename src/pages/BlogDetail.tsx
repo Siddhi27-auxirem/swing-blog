@@ -177,8 +177,6 @@ export default function BlogDetail() {
           </div>
         </section>
       )}
-
-      {/* Footer */}
     </div>
   );
 }
