@@ -35,7 +35,7 @@ function resizeImagesInContent(html: string): string {
     const cleaned = attributes
       .replace(/width="[^"]*"/g, '')
       .replace(/height="[^"]*"/g, '');
-    return `<img ${cleaned} style="max-width:100%; height:auto; display:block; margin:auto; border-radius:12px;" />`;
+    return `<img ${cleaned} style="max-width:50%; height:auto; display:block; margin:auto; border-radius:12px;" />`;
   });
 }
 
