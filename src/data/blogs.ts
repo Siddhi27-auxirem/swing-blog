@@ -23,9 +23,7 @@ export interface Blog{
 
 export const blogs: Blog[] = [];
 
-const BASE_URL = "https://node249428-env-8797427.in1.apiqcloud.com/blogs"; 
-
-
+const BASE_URL = "https://node253321-env-8797427.in1.apiqcloud.com/blogs/public"; 
 
 // Get All Blogs (GET -> /blogs/all)
 export const getAllBlogs = async (): Promise<Blog[]> => {

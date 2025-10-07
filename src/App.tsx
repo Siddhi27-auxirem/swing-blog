@@ -28,7 +28,6 @@ function AnimatedRoutes({searchTerm}: {searchTerm: string}) {
     </AnimatePresence>
   )
 }
-
 function App() {
   const [searchTerm, setSearchTerm] = useState("");
   const [blogs, setBlogs] = useState<Blog[]>([]);
